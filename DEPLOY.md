@@ -1,93 +1,82 @@
-# SK AI 部署說明
+# SK AI Baccarat Assistant Deployment
 
-這個專案已整理成兩種部署方式：
+This project can run in two modes:
 
-- 本機 / VPS Node：使用 `server.js`
-- Cloudflare Workers：使用 `worker/index.js`、`wrangler.jsonc`、Cloudflare KV
+- Local or VPS Node.js server: `server.js`
+- Cloudflare Workers with static assets: `worker/index.js`, `public/`, and `wrangler.jsonc`
 
-## 必要環境變數
+## Local / VPS Environment
 
-正式部署請把預設密碼改掉。
+Create a `.env` file or set these environment variables on your host:
 
 ```env
 PORT=3000
 HOST=0.0.0.0
 SUPERADMIN_USERNAME=koko85830
-SUPERADMIN_PASSWORD=請改成正式強密碼
+SUPERADMIN_PASSWORD=change-this-before-production
 DATA_DIR=/app/data
 ```
 
-`DATA_DIR` 必須放在平台的持久化磁碟，否則重新部署後後台使用者資料可能消失。
-
-## Cloudflare Workers + GitHub 部署
-
-### 1. 推到 GitHub
-
-在電腦安裝 Git 後：
+Run:
 
 ```bash
-git init
-git add .
-git commit -m "Initial SK AI deployment"
-git branch -M main
-git remote add origin https://github.com/你的帳號/你的倉庫.git
-git push -u origin main
+npm ci
+npm start
 ```
 
-### 2. 建立 Cloudflare KV
+## GitHub Actions + Cloudflare Workers
 
-Cloudflare Dashboard：
+The workflow at `.github/workflows/deploy-cloudflare.yml` deploys automatically when `main` is pushed, and can also be started manually from GitHub Actions.
 
-1. Workers & Pages
-2. KV
-3. Create namespace
-4. 建立 `SK_DATA`
-5. 複製 namespace ID
-6. 把 `wrangler.jsonc` 裡的 `REPLACE_WITH_PRODUCTION_KV_ID` 換成該 ID
+### Required GitHub Secrets
 
-### 3. 設定 Cloudflare Worker
+Add these in GitHub:
 
-Cloudflare Dashboard：
-
-1. Workers & Pages
-2. Create application
-3. Workers
-4. Connect to Git
-5. 選 GitHub repo
-6. Framework preset 選 None
-7. Build command 留空
-8. Deploy command 使用：
-
-```bash
-npx wrangler deploy
-```
-
-### 4. 設定 Cloudflare 環境變數
-
-Cloudflare Worker Settings 裡設定：
-
-```env
-SUPERADMIN_USERNAME=koko85830
-SUPERADMIN_PASSWORD=請換成正式強密碼
-```
-
-並確認 KV binding：
+`Settings` -> `Secrets and variables` -> `Actions` -> `New repository secret`
 
 ```text
-Binding name: SK_DATA
-Namespace: SK_DATA
+CLOUDFLARE_API_TOKEN
+CLOUDFLARE_ACCOUNT_ID
+SUPERADMIN_PASSWORD
 ```
 
-## 部署後要確認
+The Cloudflare API token needs permission to deploy Workers and manage Workers KV.
 
-部署完成後確認：
+### What The Workflow Does
 
-- `/` 首頁可以開
-- `/admin.html` 後台可以登入
-- `/shortcut.html?token=...` 使用者安裝頁可以開
-- `/api/access/validate?token=...` 可以回傳授權狀態
-- 網址必須是 HTTPS，否則 iPhone Safari 可能會擋外掛載入
+1. Checks out the repository.
+2. Installs dependencies with `npm ci`.
+3. Runs tests with `npm test`.
+4. Finds or creates these Cloudflare KV namespaces:
+   - `SK_DATA`
+   - `SK_DATA_PREVIEW`
+5. Writes the real KV IDs into `wrangler.jsonc` for the deployment run.
+6. Syncs `SUPERADMIN_PASSWORD` as a Cloudflare Worker secret.
+7. Deploys the Worker with Wrangler.
 
-## 重要提醒
+### Manual Cloudflare Deploy
 
-不要在正式環境使用預設密碼。正式部署前請把 `SUPERADMIN_PASSWORD` 換掉。
+After logging in locally with Wrangler:
+
+```bash
+npx wrangler login
+npx wrangler kv namespace create SK_DATA
+npx wrangler kv namespace create SK_DATA_PREVIEW
+```
+
+Copy the returned namespace IDs into `wrangler.jsonc`, then run:
+
+```bash
+npx wrangler secret put SUPERADMIN_PASSWORD
+npm run deploy:cloudflare
+```
+
+## Production Checks
+
+After deployment, verify:
+
+- `/` opens the mobile assistant.
+- `/admin.html` opens the admin panel.
+- `/shortcut.html?token=...` opens a user shortcut.
+- `/api/access/validate?token=...` returns access status.
+- The site is served over HTTPS, which is required for stable iPhone Safari shortcut behavior.

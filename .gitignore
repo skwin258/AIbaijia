@@ -1,5 +1,7 @@
 node_modules/
 .wrangler/
+.wrangler-config/
+.gitconfig-codex
 .dev.vars
 .env
 work/data/
