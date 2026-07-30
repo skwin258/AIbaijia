@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>路圖掃描測試頁</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #061120;
+        color: white;
+        font-family: Arial, "Microsoft JhengHei", sans-serif;
+      }
+
+      .phone-table {
+        width: min(100%, 430px);
+        min-height: 100vh;
+        margin: 0 auto;
+        background: #08182c;
+        display: grid;
+        grid-template-rows: 220px auto auto 1fr;
+      }
+
+      .video-area {
+        position: relative;
+        background:
+          radial-gradient(circle at 50% 22%, rgba(255,255,255,.22), transparent 18%),
+          linear-gradient(180deg, #172c5b 0%, #102040 48%, #70234d 49%, #8a2f5d 100%);
+        overflow: hidden;
+      }
+
+      .dealer {
+        position: absolute;
+        left: 50%;
+        top: 20px;
+        width: 86px;
+        height: 112px;
+        transform: translateX(-50%);
+        border-radius: 44px 44px 18px 18px;
+        background: linear-gradient(#f5c9ac 0 38%, #15141b 39% 100%);
+        box-shadow: 0 0 0 999px rgba(0,0,0,.04);
+      }
+
+      .dealer::before {
+        content: "";
+        position: absolute;
+        left: 18px;
+        top: -14px;
+        width: 50px;
+        height: 38px;
+        border-radius: 50% 50% 45% 45%;
+        background: #161218;
+      }
+
+      .table-label {
+        position: absolute;
+        left: 18px;
+        top: 56px;
+        font-size: 15px;
+        font-weight: 800;
+        color: rgba(255,255,255,.82);
+      }
+
+      .card-line {
+        position: absolute;
+        left: 120px;
+        right: 120px;
+        bottom: 34px;
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .card {
+        width: 34px;
+        height: 44px;
+        border-radius: 5px;
+        background: white;
+        color: #102040;
+        display: grid;
+        place-items: center;
+        font-weight: 900;
+      }
+
+      .score-strip {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 4px;
+        background: #0a1732;
+        padding: 8px;
+      }
+
+      .score {
+        min-height: 58px;
+        border: 1px solid rgba(255,255,255,.12);
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        font-weight: 900;
+        font-size: 20px;
+      }
+
+      .score small {
+        display: block;
+        margin-top: 3px;
+        color: #e9c45f;
+        font-size: 11px;
+        font-weight: 600;
+      }
+
+      .banker-text {
+        color: #ff4055;
+      }
+
+      .player-text {
+        color: #3d90ff;
+      }
+
+      .tie-text {
+        color: #80d85e;
+      }
+
+      .chips {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 8px;
+        padding: 10px 14px;
+        background: #071323;
+      }
+
+      .chip {
+        aspect-ratio: 1;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        border: 5px dashed rgba(255,255,255,.35);
+        background: #253652;
+        font-weight: 900;
+      }
+
+      .road-area {
+        background: #f8fafc;
+        color: #17212b;
+        border-top: 1px solid #ccd6e0;
+        padding: 8px;
+      }
+
+      .road-layout {
+        display: grid;
+        grid-template-columns: 48px 1fr;
+        min-height: 112px;
+      }
+
+      .bead-road,
+      .big-road {
+        display: grid;
+        border-left: 1px solid #cbd5df;
+        border-top: 1px solid #cbd5df;
+      }
+
+      .bead-road {
+        grid-template-columns: repeat(2, 24px);
+        grid-auto-rows: 18px;
+      }
+
+      .big-road {
+        grid-template-columns: repeat(18, 1fr);
+        grid-auto-rows: 18px;
+      }
+
+      .cell {
+        border-right: 1px solid #cbd5df;
+        border-bottom: 1px solid #cbd5df;
+        display: grid;
+        place-items: center;
+        background: white;
+      }
+
+      .mark {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        background: transparent;
+        border: 3px solid currentColor;
+        font-size: 10px;
+        line-height: 7px;
+        font-weight: 900;
+        text-align: center;
+      }
+
+      .banker {
+        color: #df3347;
+      }
+
+      .player {
+        color: #2467dc;
+      }
+
+      .tie {
+        color: #1e9d63;
+      }
+
+      .summary-row {
+        display: flex;
+        gap: 7px;
+        align-items: center;
+        padding-top: 8px;
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .road-title {
+        display: flex;
+        justify-content: space-between;
+        color: #526070;
+        font-size: 12px;
+        font-weight: 900;
+        margin-bottom: 5px;
+      }
+
+      .badge {
+        border-radius: 4px;
+        padding: 3px 5px;
+        color: white;
+      }
+
+      .badge.banker-bg {
+        background: #df3347;
+      }
+
+      .badge.player-bg {
+        background: #2467dc;
+      }
+
+      .badge.tie-bg {
+        background: #1e9d63;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="phone-table">
+      <section class="video-area">
+        <div class="table-label">DREAM GAMING 測試桌</div>
+        <div class="dealer"></div>
+        <div class="card-line">
+          <div class="card">Q</div>
+          <div class="card">A</div>
+        </div>
+      </section>
+
+      <section class="score-strip">
+        <div class="score player-text">閒龍寶<small>592/5</small></div>
+        <div class="score player-text">閒對<small>518/8</small></div>
+        <div class="score tie-text">幸運 6<small>162/5</small></div>
+        <div class="score banker-text">莊對<small>518/8</small></div>
+        <div class="score banker-text">莊龍寶<small>647/3</small></div>
+      </section>
+
+      <section class="chips">
+        <div class="chip">10</div>
+        <div class="chip">100</div>
+        <div class="chip">500</div>
+        <div class="chip">1K</div>
+        <div class="chip">10K</div>
+        <div class="chip">50K</div>
+      </section>
+
+      <section class="road-area">
+        <div class="road-title">
+          <span>珠盤路</span>
+          <span>大路</span>
+        </div>
+        <div class="road-layout" aria-label="測試路圖">
+          <div id="beadRoad" class="bead-road" aria-label="珠盤路"></div>
+          <div id="bigRoad" class="big-road" aria-label="大路"></div>
+        </div>
+        <div class="summary-row">
+          <span class="badge banker-bg">莊 3</span>
+          <span class="badge player-bg">閒 4</span>
+          <span class="badge tie-bg">和 1</span>
+          <span class="badge banker-bg">莊對</span>
+          <span class="badge player-bg">閒對</span>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const beadRoad = [
+        "player", "player", "tie", "player", "banker", "banker",
+        "player", "banker", "player", "player", "banker", "tie",
+        "banker", "player"
+      ];
+
+      const bigRoad = [
+        ["player", "player"],
+        ["banker"],
+        ["player", "player", "player"],
+        ["banker", "banker"],
+        ["tie"],
+        ["player"],
+        ["banker"],
+      ];
+
+      function addCell(grid, result, roadName) {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        if (result) {
+          const mark = document.createElement("span");
+          mark.className = `mark ${result}`;
+          mark.dataset.baiRoad = roadName;
+          mark.dataset.baiRoadResult = result;
+          mark.textContent = result === "tie" ? "和" : "";
+          cell.append(mark);
+        }
+        grid.append(cell);
+      }
+
+      const beadGrid = document.querySelector("#beadRoad");
+      for (let index = 0; index < 12; index += 1) {
+        addCell(beadGrid, beadRoad[index], "bead");
+      }
+
+      const bigGrid = document.querySelector("#bigRoad");
+      for (let row = 0; row < 6; row += 1) {
+        for (let col = 0; col < 18; col += 1) {
+          addCell(bigGrid, bigRoad[col]?.[row], "big");
+        }
+      }
+    </script>
+  </body>
+</html>

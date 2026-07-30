@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="AI baccarat assistant">
+  <defs>
+    <radialGradient id="chipGlow" cx="50%" cy="42%" r="62%">
+      <stop offset="0%" stop-color="#66f0ff"/>
+      <stop offset="42%" stop-color="#3279ff"/>
+      <stop offset="74%" stop-color="#5533c9"/>
+      <stop offset="100%" stop-color="#101744"/>
+    </radialGradient>
+    <linearGradient id="face" x1="25%" y1="18%" x2="78%" y2="88%">
+      <stop offset="0%" stop-color="#233e91"/>
+      <stop offset="45%" stop-color="#060b27"/>
+      <stop offset="100%" stop-color="#122768"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#dbe8ff"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#001045" flood-opacity=".45"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#4de9ff" flood-opacity=".5"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#shadow)">
+    <g transform="rotate(-16 76 78)">
+      <rect x="30" y="35" width="62" height="88" rx="12" fill="url(#card)" stroke="#dbe8ff" stroke-width="3"/>
+      <text x="45" y="68" font-family="Arial, sans-serif" font-size="32" font-weight="800" fill="#202032">A</text>
+      <path d="M52 82c8-15 28-15 36 0c-8 17-28 17-36 0z" fill="#202032"/>
+    </g>
+    <g transform="rotate(16 180 78)">
+      <rect x="164" y="35" width="62" height="88" rx="12" fill="url(#card)" stroke="#dbe8ff" stroke-width="3"/>
+      <text x="182" y="68" font-family="Arial, sans-serif" font-size="32" font-weight="800" fill="#be2538">A</text>
+      <path d="M184 85c-12-14-1-30 12-20c13-10 24 6 12 20l-12 12z" fill="#e9283f"/>
+    </g>
+
+    <circle cx="128" cy="132" r="86" fill="url(#chipGlow)" stroke="#7fefff" stroke-width="4"/>
+    <circle cx="128" cy="132" r="68" fill="#07123a" stroke="#95f4ff" stroke-width="5"/>
+    <g fill="#ffffff" opacity=".9">
+      <path d="M121 48h14l15 16l-22 16l-22-16z"/>
+      <path d="M121 216h14l15-16l-22-16l-22 16z"/>
+    </g>
+    <g fill="#0d163f">
+      <rect x="49" y="119" width="16" height="16" rx="3" transform="rotate(45 57 127)"/>
+      <rect x="191" y="119" width="16" height="16" rx="3" transform="rotate(45 199 127)"/>
+    </g>
+    <path d="M79 116c0-23 22-42 49-42s49 19 49 42v34c0 24-22 43-49 43s-49-19-49-43z" fill="#d8ecff"/>
+    <rect x="82" y="96" width="92" height="70" rx="30" fill="url(#face)" stroke="#eff8ff" stroke-width="4"/>
+    <path d="M104 129c0-13 9-24 20-24s20 11 20 24v12c-7-8-14-8-20 0c-6-8-13-8-20 0z" fill="#34efff"/>
+    <path d="M147 129c0-13 9-24 20-24s20 11 20 24v12c-7-8-14-8-20 0c-6-8-13-8-20 0z" transform="translate(-14 0)" fill="#34efff"/>
+    <path d="M111 150c12 14 29 14 41 0" fill="none" stroke="#58f5ff" stroke-width="7" stroke-linecap="round"/>
+    <rect x="103" y="74" width="50" height="23" rx="10" fill="#10205b" stroke="#a8f7ff" stroke-width="3"/>
+    <text x="112" y="92" font-family="Arial, sans-serif" font-size="18" font-weight="800" fill="#c6fbff">AI</text>
+  </g>
+</svg>

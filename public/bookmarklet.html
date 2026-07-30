@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI 浮動外掛安裝</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      .install-shell {
+        width: min(100%, 430px);
+        min-height: 100vh;
+        margin: 0 auto;
+        padding: 14px;
+        display: grid;
+        align-content: start;
+        gap: 12px;
+      }
+      .install-panel {
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px;
+        display: grid;
+        gap: 12px;
+      }
+      .bookmark-link {
+        display: grid;
+        place-items: center;
+        min-height: 54px;
+        border-radius: 8px;
+        background: var(--accent);
+        color: white;
+        font-size: 18px;
+        font-weight: 900;
+        text-decoration: none;
+      }
+      textarea {
+        width: 100%;
+        min-height: 120px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 10px;
+        resize: vertical;
+        font-size: 12px;
+      }
+      ol {
+        margin: 0;
+        padding-left: 22px;
+        line-height: 1.55;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="install-shell">
+      <section class="install-panel">
+        <p class="eyebrow">Safari 書籤外掛</p>
+        <h1>AI 浮動按鈕</h1>
+        <p class="risk-badge low">目前版本：V41 短書籤</p>
+        <button id="copyButton" class="bookmark-link" type="button">複製短書籤網址</button>
+        <p class="reason-text">書籤內容已改成短版，外掛程式會從網站載入，之後更新外掛時不用讓使用者重貼一大段程式碼。</p>
+      </section>
+
+      <section class="install-panel">
+        <h2>iPhone 設定方式</h2>
+        <ol>
+          <li>按「複製外掛網址」。</li>
+          <li>在 Safari 先新增任一書籤，名稱改成「AI 百家樂助手」。</li>
+          <li>進入 Safari 書籤編輯，把網址刪掉，貼上剛剛複製的內容。</li>
+          <li>用 Safari 打開 BC78999。</li>
+          <li>在 BC78999 畫面打開 Safari 書籤，點「AI 百家樂助手」。</li>
+        </ol>
+      </section>
+
+      <section class="install-panel">
+        <h2>重要限制</h2>
+        <p class="reason-text">不要在 LINE 內建瀏覽器或聊天圖片預覽裡執行。掃描路圖只能讀取頁面上可辨識的文字或紅藍綠元素；如果平台用圖片或 canvas 畫路圖，仍需手動輸入。</p>
+      </section>
+
+      <section class="install-panel">
+        <h2>掃描測試</h2>
+        <a class="ghost-button" href="/roadmap-scan-test.html">打開路圖測試頁</a>
+      </section>
+
+      <section class="install-panel">
+        <h2>手動複製</h2>
+        <textarea id="bookmarkCode" readonly></textarea>
+      </section>
+    </main>
+
+    <script>
+      const src = `${location.origin}/floating-assistant.js?v=41`;
+      const code = `javascript:(()=>{let s=document.createElement('script');s.src=${JSON.stringify(src)};document.body.appendChild(s)})()`;
+      const textarea = document.querySelector("#bookmarkCode");
+      const button = document.querySelector("#copyButton");
+      textarea.value = code;
+      button.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(code);
+          button.textContent = "已複製 V41";
+        } catch {
+          textarea.focus();
+          textarea.select();
+          button.textContent = "請手動複製下方文字";
+        }
+      });
+    </script>
+  </body>
+</html>

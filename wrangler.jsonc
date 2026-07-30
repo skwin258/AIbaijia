@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sk-ai-baccarat-assistant",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-07-30",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "SK_DATA",
+      "id": "REPLACE_WITH_PRODUCTION_KV_ID",
+      "preview_id": "REPLACE_WITH_PREVIEW_KV_ID"
+    }
+  ],
+  "vars": {
+    "SUPERADMIN_USERNAME": "koko85830",
+    "SUPERADMIN_PASSWORD": "CHANGE_THIS_ON_CLOUDFLARE"
+  }
+}

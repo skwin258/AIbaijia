@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>浮動外掛測試頁</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #10251f;
+        color: white;
+        font-family: Arial, "Microsoft JhengHei", sans-serif;
+      }
+      main {
+        min-height: 100vh;
+        display: grid;
+        place-content: center;
+        gap: 18px;
+        padding: 20px;
+        text-align: center;
+      }
+      .box {
+        border: 1px solid rgba(255,255,255,.25);
+        border-radius: 10px;
+        padding: 20px;
+        max-width: 360px;
+      }
+      .road {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 14px;
+      }
+      .dot {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+      }
+      .banker { background: #df3347; }
+      .player { background: #2467dc; }
+      .tie { background: #1e9d63; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="box">
+        <h1>浮動外掛測試頁</h1>
+        <p>在這一頁點 Safari 書籤「AI 百家樂助手」，應該會出現 AI V4。</p>
+        <div class="road">
+          <span class="dot banker"></span>
+          <span class="dot banker"></span>
+          <span class="dot player"></span>
+          <span class="dot tie"></span>
+          <span class="dot player"></span>
+          <span class="dot banker"></span>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

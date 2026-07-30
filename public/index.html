@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>SK AI 百家樂外掛助手</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #03040b;
+      }
+
+      body {
+        display: grid;
+        place-items: start center;
+        font-family: Arial, "Microsoft JhengHei", sans-serif;
+      }
+
+      .home {
+        width: min(100vw, 560px);
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 50% 74%, rgba(31, 255, 212, 0.2), transparent 22%),
+          linear-gradient(180deg, #050817 0%, #06030f 100%);
+        overflow: hidden;
+      }
+
+      .poster-slice {
+        width: 100%;
+        background-image: url("/home-poster.png");
+        background-repeat: no-repeat;
+        background-size: 100% auto;
+      }
+
+      .poster-top {
+        aspect-ratio: 941 / 1218;
+        background-position: center top;
+      }
+
+      .install-zone {
+        position: relative;
+        display: grid;
+        place-items: center;
+        min-height: clamp(82px, 15.4vw, 116px);
+        padding: 10px 0 12px;
+        background:
+          radial-gradient(ellipse at 50% 42%, rgba(46, 255, 211, 0.22), transparent 62%),
+          linear-gradient(90deg, rgba(24, 11, 38, 0.92), rgba(7, 29, 44, 0.96) 50%, rgba(24, 11, 38, 0.92));
+      }
+
+      .install-zone::before,
+      .install-zone::after {
+        content: "";
+        position: absolute;
+        left: 9%;
+        right: 9%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 216, 108, 0.82), rgba(65, 235, 255, 0.78), transparent);
+      }
+
+      .install-zone::before {
+        top: 6px;
+      }
+
+      .install-zone::after {
+        bottom: 7px;
+      }
+
+      .install-button {
+        position: relative;
+        z-index: 1;
+        width: 68%;
+        min-height: clamp(58px, 10.8vw, 78px);
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        isolation: isolate;
+        overflow: hidden;
+        color: #ffffff;
+        text-decoration: none;
+        font-size: clamp(25px, 6.4vw, 40px);
+        font-weight: 900;
+        letter-spacing: 0;
+        text-shadow:
+          0 2px 0 rgba(0, 0, 0, 0.42),
+          0 0 16px rgba(255, 255, 255, 0.56);
+        background:
+          linear-gradient(180deg, rgba(255,255,255,.32), rgba(255,255,255,0) 38%),
+          linear-gradient(135deg, #0b4a73 0%, #075b88 34%, #122866 72%, #4c1c81 100%);
+        border: 2px solid rgba(255, 214, 115, 0.82);
+        box-shadow:
+          0 0 0 2px rgba(52, 223, 255, 0.42),
+          0 0 24px rgba(48, 235, 255, 0.68),
+          0 0 46px rgba(141, 77, 255, 0.54),
+          inset 0 2px 0 rgba(255, 255, 255, 0.55),
+          inset 0 -7px 14px rgba(0, 0, 0, 0.34);
+        animation: button-breathe 1.6s ease-in-out infinite;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .install-button::before {
+        content: "";
+        position: absolute;
+        inset: 7px;
+        border-radius: 12px;
+        border: 1px solid rgba(91, 241, 255, 0.82);
+        pointer-events: none;
+      }
+
+      .install-button::after {
+        content: "";
+        position: absolute;
+        inset: -42% -22%;
+        z-index: -1;
+        background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.74) 48%, transparent 66%);
+        transform: translateX(-115%);
+        animation: button-shine 2.05s ease-in-out infinite;
+      }
+
+      .install-button:active {
+        transform: scale(0.965);
+        animation-play-state: paused;
+      }
+
+      .install-button:focus-visible {
+        outline: 3px solid rgba(80, 238, 255, 0.95);
+        outline-offset: 4px;
+      }
+
+      .poster-bottom {
+        aspect-ratio: 941 / 322;
+        background-position: center bottom;
+      }
+
+      @keyframes button-breathe {
+        0%,
+        100% {
+          filter: brightness(1);
+        }
+        50% {
+          filter: brightness(1.18);
+        }
+      }
+
+      @keyframes button-shine {
+        0%,
+        34% {
+          transform: translateX(-115%);
+        }
+        78%,
+        100% {
+          transform: translateX(115%);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="home" aria-label="SK AI 百家樂外掛助手">
+      <div class="poster-slice poster-top" role="img" aria-label="SK AI 百家樂外掛助手宣傳主視覺"></div>
+      <section class="install-zone" aria-label="安裝浮動外掛助手">
+        <a class="install-button" href="/bookmarklet.html">安裝外掛助手</a>
+      </section>
+      <div class="poster-slice poster-bottom" aria-hidden="true"></div>
+    </main>
+  </body>
+</html>

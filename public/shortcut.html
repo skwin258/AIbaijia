@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>SK AI 短書籤安裝</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 18% 8%, rgba(40, 223, 255, .28), transparent 30%),
+          radial-gradient(circle at 86% 18%, rgba(134, 79, 255, .28), transparent 34%),
+          linear-gradient(180deg, #07111f, #050713);
+        color: #f6fbff;
+        font-family: Arial, "Microsoft JhengHei", sans-serif;
+      }
+      main {
+        width: min(100%, 430px);
+        margin: 0 auto;
+        padding: 14px;
+        display: grid;
+        gap: 12px;
+      }
+      .panel {
+        border: 1px solid rgba(130, 231, 255, .24);
+        border-radius: 18px;
+        background: linear-gradient(145deg, rgba(255,255,255,.13), rgba(255,255,255,.055));
+        box-shadow: 0 18px 52px rgba(0,0,0,.32);
+        padding: 15px;
+        display: grid;
+        gap: 12px;
+        backdrop-filter: blur(18px);
+      }
+      .eyebrow {
+        margin: 0;
+        color: #82f1ff;
+        font-size: 12px;
+        font-weight: 900;
+      }
+      h1, h2 { margin: 0; line-height: 1.2; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 17px; }
+      p, ol {
+        margin: 0;
+        color: #c8d7e8;
+        line-height: 1.65;
+      }
+      ol { padding-left: 22px; }
+      .status {
+        border-radius: 12px;
+        padding: 10px 12px;
+        background: rgba(8, 18, 34, .56);
+        color: #cfe8f7;
+        font-size: 13px;
+      }
+      button {
+        min-height: 52px;
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,.42);
+        color: #061523;
+        font-size: 17px;
+        font-weight: 900;
+        background: linear-gradient(135deg, #77f7ff, #2affc5 48%, #9aff7a);
+        box-shadow: 0 0 28px rgba(50, 235, 255, .36);
+      }
+      textarea {
+        width: 100%;
+        min-height: 92px;
+        border: 1px solid rgba(160, 204, 230, .32);
+        border-radius: 12px;
+        background: rgba(4, 10, 20, .78);
+        color: #dff8ff;
+        padding: 10px;
+        resize: vertical;
+        font-size: 12px;
+      }
+      .hidden { display: none; }
+      .danger {
+        color: #ffd4dc;
+        border-color: rgba(255, 95, 122, .35);
+        background: rgba(255, 67, 96, .12);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="panel">
+        <p class="eyebrow">專屬短書籤外掛</p>
+        <h1 id="title">檢查授權中</h1>
+        <p id="status" class="status">正在確認此連結是否可使用。</p>
+        <button id="copyButton" type="button" disabled>複製短書籤網址</button>
+      </section>
+
+      <section class="panel">
+        <h2>iPhone 安裝方式</h2>
+        <ol>
+          <li>按「複製短書籤網址」。</li>
+          <li>在 Safari 新增任一書籤，名稱改成「SK AI 助手」。</li>
+          <li>編輯書籤，把網址刪掉，貼上剛剛複製的內容。</li>
+          <li>打開百家樂網站後，從 Safari 書籤執行「SK AI 助手」。</li>
+        </ol>
+      </section>
+
+      <section class="panel">
+        <h2>短書籤網址</h2>
+        <textarea id="bookmarkCode" readonly></textarea>
+      </section>
+
+      <section id="blockedPanel" class="panel danger hidden">
+        此使用者已停用或到期，請聯絡管理員重新啟用。
+      </section>
+    </main>
+
+    <script>
+      const params = new URLSearchParams(location.search);
+      const token = params.get("token") || "";
+      const title = document.querySelector("#title");
+      const statusText = document.querySelector("#status");
+      const copyButton = document.querySelector("#copyButton");
+      const textarea = document.querySelector("#bookmarkCode");
+      const blockedPanel = document.querySelector("#blockedPanel");
+
+      function shortBookmarklet(accessToken) {
+        const src = `${location.origin}/floating-assistant.js?v=41`;
+        return `javascript:(()=>{window.__BAI_ACCESS_TOKEN=${JSON.stringify(accessToken)};window.__BAI_API_ORIGIN=${JSON.stringify(location.origin)};let s=document.createElement('script');s.src=${JSON.stringify(src)};document.body.appendChild(s)})()`;
+      }
+
+      async function load() {
+        const response = await fetch(`/api/access/validate?token=${encodeURIComponent(token)}`, { cache: "no-store" });
+        const validation = await response.json();
+        if (!validation.active) {
+          title.textContent = "此外掛已停用";
+          statusText.textContent = validation.error || "此使用者尚未啟用或已到期。";
+          blockedPanel.classList.remove("hidden");
+          return;
+        }
+
+        const code = shortBookmarklet(token);
+        title.textContent = `${validation.user.name} 的專屬外掛`;
+        statusText.textContent = `授權有效，到期時間：${new Date(validation.user.expiresAt).toLocaleString("zh-TW")}`;
+        textarea.value = code;
+        copyButton.disabled = false;
+        copyButton.addEventListener("click", async () => {
+          await navigator.clipboard.writeText(code);
+          copyButton.textContent = "已複製";
+          setTimeout(() => {
+            copyButton.textContent = "複製短書籤網址";
+          }, 1400);
+        });
+      }
+
+      load().catch((error) => {
+        title.textContent = "連結無法使用";
+        statusText.textContent = error.message || "請稍後再試。";
+        blockedPanel.classList.remove("hidden");
+      });
+    </script>
+  </body>
+</html>

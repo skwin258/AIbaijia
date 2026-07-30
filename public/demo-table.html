@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>示範百家樂平台</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Arial, "Microsoft JhengHei", sans-serif;
+        background: #10251f;
+        color: white;
+      }
+      .table {
+        min-height: 100vh;
+        padding: 16px;
+        display: grid;
+        align-content: center;
+        gap: 14px;
+      }
+      .felt {
+        border: 1px solid rgba(255,255,255,.18);
+        background: #164334;
+        min-height: 190px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+      .side {
+        display: grid;
+        place-items: center;
+        border-right: 1px solid rgba(255,255,255,.18);
+        font-size: 28px;
+        font-weight: 800;
+      }
+      .side:last-child { border-right: 0; }
+      .road {
+        display: grid;
+        grid-template-columns: repeat(12, 22px);
+        grid-auto-rows: 22px;
+        gap: 5px;
+        padding: 12px;
+        background: white;
+        border-radius: 6px;
+        width: max-content;
+        max-width: 100%;
+        overflow: hidden;
+      }
+      .dot {
+        border-radius: 50%;
+        border: 3px solid currentColor;
+        background: white;
+      }
+      .banker { color: #d9343f; }
+      .player { color: #2166e8; }
+      .tie { color: #1f9d55; }
+      .actions {
+        display: flex;
+        gap: 8px;
+      }
+      button {
+        flex: 1;
+        border: 0;
+        border-radius: 6px;
+        padding: 12px 10px;
+        font-weight: 800;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="table">
+      <section class="felt">
+        <div class="side">莊</div>
+        <div class="side">閒</div>
+      </section>
+      <section class="road" aria-label="示範路單">
+        <span class="dot banker"></span><span class="dot banker"></span><span class="dot player"></span>
+        <span class="dot player"></span><span class="dot player"></span><span class="dot banker"></span>
+        <span class="dot tie"></span><span class="dot banker"></span><span class="dot banker"></span>
+        <span class="dot player"></span><span class="dot banker"></span><span class="dot player"></span>
+      </section>
+      <div class="actions">
+        <button>下注莊</button>
+        <button>下注閒</button>
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SK AI 百家樂外掛助手宣傳圖</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #06101f;
+        color: #f4fbff;
+        font-family: Arial, "Microsoft JhengHei", sans-serif;
+      }
+      .shell {
+        width: min(100%, 560px);
+        margin: 0 auto;
+        padding: 12px;
+        display: grid;
+        gap: 12px;
+      }
+      .toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: grid;
+        gap: 8px;
+        padding: 10px;
+        border: 1px solid rgba(127, 230, 255, .22);
+        border-radius: 16px;
+        background: rgba(9, 20, 37, .86);
+        backdrop-filter: blur(16px);
+      }
+      label,
+      button {
+        min-height: 44px;
+        border: 1px solid rgba(105, 232, 255, .42);
+        border-radius: 13px;
+        background: linear-gradient(135deg, rgba(42, 214, 255, .22), rgba(40, 255, 190, .16));
+        color: #f5fcff;
+        font-size: 15px;
+        font-weight: 900;
+        display: grid;
+        place-items: center;
+      }
+      input { display: none; }
+      .hint {
+        margin: 0;
+        color: #aebfd1;
+        font-size: 12px;
+        line-height: 1.6;
+        text-align: center;
+      }
+      canvas {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 22px;
+        box-shadow: 0 22px 70px rgba(0,0,0,.42);
+        background: #07101d;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="toolbar">
+        <label>
+          選擇你剛剛那張遊戲截圖
+          <input id="screenInput" type="file" accept="image/*" />
+        </label>
+        <button id="downloadButton" type="button">下載長圖 PNG</button>
+        <p class="hint">手機畫面會使用你選的原圖，不會重新生成或改內容。</p>
+      </section>
+      <canvas id="poster" width="1080" height="2400"></canvas>
+    </main>
+
+    <script>
+      const canvas = document.querySelector("#poster");
+      const ctx = canvas.getContext("2d");
+      const input = document.querySelector("#screenInput");
+      const downloadButton = document.querySelector("#downloadButton");
+      const icon = new Image();
+      let screenImage = null;
+      icon.src = "/ai-chip-icon-small.png";
+      icon.onload = drawPoster;
+
+      function roundRect(x, y, w, h, r) {
+        const radius = Math.min(r, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.arcTo(x + w, y, x + w, y + h, radius);
+        ctx.arcTo(x + w, y + h, x, y + h, radius);
+        ctx.arcTo(x, y + h, x, y, radius);
+        ctx.arcTo(x, y, x + w, y, radius);
+        ctx.closePath();
+      }
+
+      function fillRoundRect(x, y, w, h, r, fill, stroke) {
+        roundRect(x, y, w, h, r);
+        ctx.fillStyle = fill;
+        ctx.fill();
+        if (stroke) {
+          ctx.strokeStyle = stroke;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+      }
+
+      function strokeRoundRect(x, y, w, h, r, color, lineWidth = 2) {
+        roundRect(x, y, w, h, r);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = lineWidth;
+        ctx.stroke();
+      }
+
+      function drawGlowCircle(x, y, radius, color) {
+        const glow = ctx.createRadialGradient(x, y, 0, x, y, radius);
+        glow.addColorStop(0, color);
+        glow.addColorStop(.42, color.replace(/,\s*[\d.]+\)/, ", .18)"));
+        glow.addColorStop(1, color.replace(/,\s*[\d.]+\)/, ", 0)"));
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function drawDiamond(x, y, size, color) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(Math.PI / 4);
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 18;
+        fillRoundRect(-size / 2, -size / 2, size, size, 5, color, "rgba(255,255,255,.65)");
+        ctx.restore();
+      }
+
+      function drawShineLine(x1, y1, x2, y2, color, width = 3) {
+        ctx.save();
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 14;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawText(text, x, y, size, color, weight = "700", align = "left", lineHeight = 1.35) {
+        ctx.font = `${weight} ${size}px Arial, "Microsoft JhengHei", sans-serif`;
+        ctx.fillStyle = color;
+        ctx.textAlign = align;
+        ctx.textBaseline = "top";
+        String(text).split("\n").forEach((line, index) => {
+          ctx.fillText(line, x, y + index * size * lineHeight);
+        });
+      }
+
+      function drawGradientText(text, x, y, size, colors, weight = "900", align = "center", lineHeight = 1.15) {
+        const gradient = ctx.createLinearGradient(220, y, 860, y + size * 2);
+        colors.forEach(([stop, color]) => gradient.addColorStop(stop, color));
+        ctx.save();
+        ctx.font = `${weight} ${size}px Arial, "Microsoft JhengHei", sans-serif`;
+        ctx.textAlign = align;
+        ctx.textBaseline = "top";
+        ctx.shadowColor = "rgba(51,226,255,.58)";
+        ctx.shadowBlur = 24;
+        ctx.fillStyle = gradient;
+        String(text).split("\n").forEach((line, index) => {
+          ctx.fillText(line, x, y + index * size * lineHeight);
+        });
+        ctx.restore();
+      }
+
+      function drawBackground() {
+        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        gradient.addColorStop(0, "#09091b");
+        gradient.addColorStop(.33, "#0b1530");
+        gradient.addColorStop(.68, "#090f22");
+        gradient.addColorStop(1, "#03040c");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const glow1 = ctx.createRadialGradient(175, 155, 0, 175, 155, 670);
+        glow1.addColorStop(0, "rgba(42,224,255,.58)");
+        glow1.addColorStop(1, "rgba(41,218,255,0)");
+        ctx.fillStyle = glow1;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const glow2 = ctx.createRadialGradient(860, 360, 0, 860, 360, 680);
+        glow2.addColorStop(0, "rgba(142,74,255,.55)");
+        glow2.addColorStop(1, "rgba(126,76,255,0)");
+        ctx.fillStyle = glow2;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const glow3 = ctx.createRadialGradient(540, 1760, 0, 540, 1760, 760);
+        glow3.addColorStop(0, "rgba(44,255,196,.28)");
+        glow3.addColorStop(1, "rgba(44,255,196,0)");
+        ctx.fillStyle = glow3;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.strokeStyle = "rgba(120,225,255,.08)";
+        ctx.lineWidth = 1;
+        for (let x = 0; x <= canvas.width; x += 52) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, canvas.height);
+          ctx.stroke();
+        }
+        for (let y = 0; y <= canvas.height; y += 52) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(canvas.width, y);
+          ctx.stroke();
+        }
+
+        ctx.save();
+        ctx.globalAlpha = .55;
+        for (let i = 0; i < 9; i += 1) {
+          drawShineLine(-90 + i * 150, 330 + i * 162, 90 + i * 150, 190 + i * 162, "rgba(125,238,255,.32)", 2);
+        }
+        ctx.restore();
+
+        drawGlowCircle(96, 680, 170, "rgba(255, 205, 82, .22)");
+        drawGlowCircle(990, 1180, 210, "rgba(135, 85, 255, .22)");
+        drawDiamond(140, 260, 26, "rgba(112,238,255,.88)");
+        drawDiamond(945, 206, 32, "rgba(184,121,255,.86)");
+        drawDiamond(900, 1846, 24, "rgba(48,255,201,.85)");
+      }
+
+      function drawPhone() {
+        const x = 245;
+        const y = 470;
+        const w = 590;
+        const h = 1048;
+        drawGlowCircle(540, 960, 480, "rgba(50,225,255,.28)");
+        drawGlowCircle(540, 1040, 360, "rgba(152,83,255,.24)");
+
+        ctx.save();
+        ctx.translate(540, 1006);
+        ctx.rotate(-0.035);
+        ctx.strokeStyle = "rgba(112,238,255,.34)";
+        ctx.lineWidth = 3;
+        for (let i = 0; i < 4; i += 1) {
+          ctx.beginPath();
+          ctx.ellipse(0, 0, 372 + i * 32, 498 + i * 22, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        ctx.shadowColor = "rgba(30,220,255,.5)";
+        ctx.shadowBlur = 74;
+        fillRoundRect(x - 22, y - 22, w + 44, h + 44, 78, "rgba(255,255,255,.145)", "rgba(175,238,255,.45)");
+        ctx.shadowBlur = 0;
+        fillRoundRect(x - 7, y - 7, w + 14, h + 14, 62, "rgba(12,20,38,.92)", "rgba(255,216,108,.32)");
+        fillRoundRect(x, y, w, h, 54, "#07111f", "rgba(255,255,255,.22)");
+
+        ctx.save();
+        roundRect(x + 16, y + 16, w - 32, h - 32, 42);
+        ctx.clip();
+        if (screenImage) {
+          const sw = screenImage.width;
+          const sh = screenImage.height;
+          const scale = Math.max((w - 32) / sw, (h - 32) / sh);
+          const dw = sw * scale;
+          const dh = sh * scale;
+          ctx.drawImage(screenImage, x + 16 + ((w - 32) - dw) / 2, y + 16 + ((h - 32) - dh) / 2, dw, dh);
+        } else {
+          const pg = ctx.createLinearGradient(x, y, x, y + h);
+          pg.addColorStop(0, "#12243d");
+          pg.addColorStop(1, "#08111f");
+          ctx.fillStyle = pg;
+          ctx.fillRect(x + 16, y + 16, w - 32, h - 32);
+          drawText("選擇遊戲截圖後\n會原封不動放進這裡", x + w / 2, y + h / 2 - 56, 34, "#b8cce0", "900", "center");
+        }
+        ctx.restore();
+
+        if (icon.complete) {
+          ctx.shadowColor = "rgba(68,226,255,.88)";
+          ctx.shadowBlur = 36;
+          ctx.drawImage(icon, 740, 390, 196, 196);
+          ctx.shadowBlur = 0;
+        }
+
+        const floor = ctx.createRadialGradient(540, 1566, 0, 540, 1566, 340);
+        floor.addColorStop(0, "rgba(62,230,255,.34)");
+        floor.addColorStop(1, "rgba(62,230,255,0)");
+        ctx.fillStyle = floor;
+        ctx.beginPath();
+        ctx.ellipse(540, 1566, 350, 54, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function drawCta() {
+        const x = 230;
+        const y = 1572;
+        const w = 620;
+        const h = 92;
+        const gradient = ctx.createLinearGradient(x, y, x + w, y + h);
+        gradient.addColorStop(0, "#7df7ff");
+        gradient.addColorStop(.45, "#2fffc5");
+        gradient.addColorStop(1, "#a2ff89");
+        ctx.shadowColor = "rgba(47,255,197,.55)";
+        ctx.shadowBlur = 44;
+        fillRoundRect(x, y, w, h, 28, gradient, "rgba(255,255,255,.58)");
+        ctx.shadowBlur = 0;
+        strokeRoundRect(x + 8, y + 8, w - 16, h - 16, 22, "rgba(255,255,255,.38)", 2);
+        drawText("安裝外掛助手", x + w / 2, y + 24, 42, "#061523", "900", "center");
+        drawShineLine(x + 64, y + 16, x + 190, y + 16, "rgba(255,255,255,.66)", 4);
+      }
+
+      function drawFeature(x, y, title, body) {
+        const cardGradient = ctx.createLinearGradient(x, y, x + 446, y + 176);
+        cardGradient.addColorStop(0, "rgba(255,255,255,.18)");
+        cardGradient.addColorStop(.55, "rgba(105,184,255,.08)");
+        cardGradient.addColorStop(1, "rgba(132,77,255,.13)");
+        ctx.shadowColor = "rgba(26,171,255,.16)";
+        ctx.shadowBlur = 24;
+        fillRoundRect(x, y, 446, 176, 28, cardGradient, "rgba(159,230,255,.34)");
+        ctx.shadowBlur = 0;
+        drawDiamond(x + 392, y + 38, 18, "rgba(74,238,255,.82)");
+        drawText(title, x + 28, y + 28, 34, "#f8fdff", "900");
+        drawText(body, x + 28, y + 82, 25, "#bad0e2", "700");
+      }
+
+      function drawPoster() {
+        drawBackground();
+        drawShineLine(196, 134, 884, 134, "rgba(93,231,255,.26)", 2);
+        drawShineLine(270, 324, 810, 324, "rgba(172,119,255,.24)", 2);
+        fillRoundRect(310, 70, 460, 58, 29, "rgba(255,255,255,.12)", "rgba(130,230,255,.46)");
+        drawText("Safari 浮動外掛助手", 540, 84, 24, "#86efff", "900", "center");
+        drawGradientText("SK AI 百家樂\n外掛助手", 540, 154, 82, [[0, "#ffffff"], [.45, "#7ef5ff"], [1, "#a783ff"]]);
+        drawText("手機即開即用，邊看牌路邊輸入\nAI 即時給出下一局分析。", 540, 348, 31, "#c5d6e8", "700", "center", 1.45);
+
+        drawPhone();
+        drawCta();
+
+        drawText("看路更快，判斷更穩", 540, 1714, 52, "#f7fcff", "900", "center");
+        drawText("讓每一局都有依據", 540, 1784, 31, "#b9cbdd", "700", "center");
+
+        fillRoundRect(348, 1830, 384, 48, 24, "rgba(255,255,255,.1)", "rgba(255,214,102,.32)");
+        drawText("四大核心功能", 540, 1841, 22, "#ffe193", "900", "center");
+        drawFeature(66, 1872, "輸入路圖", "快速記錄每一局結果");
+        drawFeature(568, 1872, "開始分析", "進入快捷輸入模式");
+        drawFeature(66, 2072, "目前戰績", "查看當局 / 當日\n勝負與獲利");
+        drawFeature(568, 2072, "AI 通知", "下一局推薦\n即時跳出");
+
+        const chips = ["浮動 ICON 外掛", "即時路圖紀錄", "AI 下一局建議", "手機專用設計"];
+        let x = 126;
+        chips.forEach((chip) => {
+          const w = 196;
+          fillRoundRect(x, 2292, w, 48, 24, "rgba(7,17,31,.52)", "rgba(122,226,255,.26)");
+          drawText(chip, x + w / 2, 2303, 20, "#9eeeff", "900", "center");
+          x += w + 18;
+        });
+      }
+
+      input.addEventListener("change", () => {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          screenImage = new Image();
+          screenImage.onload = drawPoster;
+          screenImage.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      downloadButton.addEventListener("click", () => {
+        const link = document.createElement("a");
+        link.download = "sk-ai-baccarat-poster.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+
+      drawPoster();
+    </script>
+  </body>
+</html>
