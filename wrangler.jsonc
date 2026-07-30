@@ -15,7 +15,6 @@
     }
   ],
   "vars": {
-    "SUPERADMIN_USERNAME": "koko85830",
-    "SUPERADMIN_PASSWORD": "CHANGE_THIS_ON_CLOUDFLARE"
+    "SUPERADMIN_USERNAME": "koko85830"
   }
 }

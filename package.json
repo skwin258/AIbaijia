@@ -8,5 +8,8 @@
     "test": "node --test",
     "deploy:cloudflare": "wrangler deploy",
     "dev:cloudflare": "wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "^4.115.0"
   }
 }

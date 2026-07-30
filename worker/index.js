@@ -72,12 +72,14 @@ function isUserActive(user) {
 }
 
 async function normalizeAdminStore(store, env) {
+  const superUsername = env.SUPERADMIN_USERNAME || "koko85830";
+  const superPassword = env.SUPERADMIN_PASSWORD || "change-this-password";
   const admins = Array.isArray(store?.admins) ? store.admins : [];
-  if (!admins.some((admin) => admin.username === env.SUPERADMIN_USERNAME)) {
+  if (!admins.some((admin) => admin.username === superUsername)) {
     admins.unshift({
       id: "superadmin",
-      username: env.SUPERADMIN_USERNAME,
-      passwordHash: await hashPassword(env.SUPERADMIN_PASSWORD),
+      username: superUsername,
+      passwordHash: await hashPassword(superPassword),
       role: "superadmin",
       enabled: true,
       createdAt: todayIso(),
